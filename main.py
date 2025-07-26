@@ -6,7 +6,7 @@ import os
 app = FastAPI()
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-MODEL = "mistralai/mixtral-8x7b"
+MODEL = "mixtral-8x7b-32768"  # ✅ This is the correct ID for OpenRouter
 
 class RequestBody(BaseModel):
     topic: str
@@ -21,7 +21,7 @@ def generate_content(request: RequestBody):
 
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "HTTP-Referer": "https://yourdomain.com",
+        "HTTP-Referer": "https://yourdomain.com",  # Required by OpenRouter
         "X-Title": "AI Content Generator"
     }
 
