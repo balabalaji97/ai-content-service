@@ -6,7 +6,7 @@ import os
 app = FastAPI()
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-MODEL = "openchat/openchat-3.5-0106"  # You can try others from openrouter.ai
+MODEL = "openrouter/cinematika-7b"  # ✅ Confirmed working model
 
 class RequestBody(BaseModel):
     topic: str
@@ -21,7 +21,7 @@ def generate_content(request: RequestBody):
 
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "HTTP-Referer": "https://yourdomain.com",
+        "HTTP-Referer": "https://yourdomain.com",  # Required, can be any domain
         "X-Title": "AI Content Generator"
     }
 
@@ -36,7 +36,6 @@ def generate_content(request: RequestBody):
         response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
         result = response.json()
 
-        # Check if response contains choices
         if "choices" not in result:
             return {
                 "error": "Unexpected response from OpenRouter",
@@ -49,5 +48,5 @@ def generate_content(request: RequestBody):
     except Exception as e:
         return {
             "error": str(e),
-            "hint": "Check if OPENROUTER_API_KEY is set in Render, or if the model name is valid."
+            "hint": "Check if OPENROUTER_API_KEY is valid and model is correct."
         }
