@@ -5,40 +5,41 @@ import os
 
 app = FastAPI()
 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-MODEL = "mixtral-8x7b-32768"  # ✅ This is the correct ID for OpenRouter
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
+API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 class RequestBody(BaseModel):
     topic: str
 
 @app.get("/")
 def root():
-    return {"status": "AI Content Generator using OpenRouter is online."}
+    return {"status": "AI Content Generator using DeepSeek is online."}
 
 @app.post("/generate")
 def generate_content(request: RequestBody):
     prompt = f"Write a motivational, business, or fitness tip about: {request.topic}"
 
     headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "HTTP-Referer": "https://yourdomain.com",  # Required by OpenRouter
-        "X-Title": "AI Content Generator"
+        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+        "Content-Type": "application/json"
     }
 
     data = {
-        "model": MODEL,
+        "model": "deepseek-chat",
         "messages": [
             {"role": "user", "content": prompt}
-        ]
+        ],
+        "temperature": 0.7,
+        "max_tokens": 200
     }
 
     try:
-        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
+        response = requests.post(API_URL, headers=headers, json=data)
         result = response.json()
 
         if "choices" not in result:
             return {
-                "error": "Unexpected response from OpenRouter",
+                "error": "Unexpected response from DeepSeek",
                 "raw_response": result
             }
 
@@ -48,5 +49,5 @@ def generate_content(request: RequestBody):
     except Exception as e:
         return {
             "error": str(e),
-            "hint": "Check if OPENROUTER_API_KEY is valid and model is correct."
+            "hint": "Check your DeepSeek API key or if the model is available."
         }
